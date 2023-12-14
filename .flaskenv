@@ -1,0 +1,4 @@
+FLASK_APP=api
+FLASK_ENV=development
+FLASK_DEBUG=True
+FLASK_RUN_HOST=10.0.0.53
