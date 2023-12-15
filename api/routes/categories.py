@@ -7,13 +7,6 @@ data = datetime.now().strftime('%d-%m-%Y')
 
 from ..extensions import mongo
 
-# _nomes = ['ESPETOS','CERVEJAS','BEBIDAS']
-# _datas = [ data, data, data]
-
-# doc = []
-# for nome, adicionado_em in zip(_nomes, _datas):
-#     doc.append({'nome':nome,'adicionado_em': adicionado_em})  
-
 category = Blueprint('category', __name__)
 @category.route('/api/category/get', methods=['GET'])
 def get_categories():
@@ -77,12 +70,52 @@ def post_categories():
             mimetype = "application/json"
         )
 
-
-
 @category.route('/api/category/put/<id>', methods=['PUT'])
-def put_categories():
-    pass
+def put_categories(id):
+    tb_categorias = mongo.db['TB_CATEGORIAS']
+
+    _nome = request.get_json()['nome']
+    _adicionado_em = data
+    _usuario_id = request.get_json()['usuario_id']
+
+    categorySchema = { '$set': { 
+        'nome': _nome,
+        'adicionado_em':_adicionado_em,
+        'usuario_id': ObjectId(_usuario_id)
+    }}
+
+    hasCategoryID = tb_categorias.find_one({'_id': ObjectId(id)})
+    if hasCategoryID:
+        filtro = { "_id" : hasCategoryID['_id'] }
+        tb_categorias.update_one(filtro, categorySchema)
+        return Response(
+            response = json.dumps('CATEGORIA ALTERADA!'),
+            status = 200,
+            mimetype = "application/json"
+            )
+    else:        
+        return Response(
+            response = json.dumps('ERRO! CATEGORIA NAO EXISTE NO BANCO'),
+            status = 500,
+            mimetype = "application/json"
+        )
 
 @category.route('/api/category/delete/<id>', methods=['DELETE'])
-def delete_categories():
-    pass
+def delete_categories(id):
+    tb_categorias = mongo.db['TB_CATEGORIAS']
+
+    hasCategoryID = tb_categorias.find_one({'_id': ObjectId(id)})
+    if hasCategoryID:
+        filtro = { "_id" : hasCategoryID['_id'] }
+        tb_categorias.delete_one(filtro)
+        return Response(
+            response = json.dumps('CATEGORIA DELETADA!'),
+            status = 200,
+            mimetype = "application/json"
+            )
+    else:        
+        return Response(
+            response = json.dumps('ERRO! CATEGORIA NAO EXISTE NO BANCO'),
+            status = 500,
+            mimetype = "application/json"
+        )

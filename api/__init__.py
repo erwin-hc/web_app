@@ -4,6 +4,7 @@ from .routes.main import main
 from .routes.users import user
 from .routes.custumers import custumer
 from .routes.categories import category
+from .routes.sizes import size
 
 def create_app(config_object='api.settings'):
     app = Flask(__name__)
@@ -12,6 +13,7 @@ def create_app(config_object='api.settings'):
     app.register_blueprint(custumer)
     app.register_blueprint(main)
     app.register_blueprint(category)
+    app.register_blueprint(size)
       
     mongo.init_app(app)
     return app
