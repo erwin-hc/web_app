@@ -73,9 +73,37 @@ def post_custumer():
             mimetype = "application/json"
         )
 
-@custumer.route('/api/custumer/put/<id>')
+@custumer.route('/api/custumer/put/<id>', methods=['PUT'])
 def put_custumer(id):
-    pass
+    tb_clientes = mongo.db['TB_CLIENTES']
+
+    _nome = request.get_json()['nome']
+    _fone = request.get_json()['fone']
+    _usuario_id = request.get_json()['usuario_id']
+    _adicionado_em = data
+
+    custumerSchema = { "$set": {
+        'nome': _nome,
+        'fone': _fone,
+        'adicionado_em':_adicionado_em,
+        'usuario_id': ObjectId(_usuario_id)
+    }}
+
+    hasCustumerID = tb_clientes.find_one({'_id': ObjectId(id)})
+    if not hasCustumerID:
+        return Response(
+            response = json.dumps('ERRO! CLIENTE NAO ENCONTRADO'),
+            status = 500,
+            mimetype = "application/json"
+        )
+    else:
+        filtro = { "_id" : hasCustumerID['_id'] }
+        tb_clientes.update_one(filtro, custumerSchema)
+        return Response(
+            response = json.dumps('CLIENTE ATUALIZADO'),
+            status = 200,
+            mimetype = "application/json"
+        )
 
 @custumer.route('/api/custumer/delete/<id>')
 def delete_custumer(id):

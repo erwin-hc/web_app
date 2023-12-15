@@ -43,8 +43,8 @@ def post_user():
         'email': _email
     }
 
-    hasUser = tb_usuarios.find_one({'email':_email})
-    if not hasUser and request.method == 'POST':
+    hasUserEmail = tb_usuarios.find_one({'email':_email})
+    if not hasUserEmail and request.method == 'POST':
         tb_usuarios.insert_one(userSchema)
         return Response(
             response = json.dumps('USUARIO RECEBIDO!'),
@@ -74,8 +74,8 @@ def put_user(id):
         'email': _email
     }}
 
-    hasID = tb_usuarios.find_one({'_id': ObjectId(id)})
-    if not hasID:
+    hasUserID = tb_usuarios.find_one({'_id': ObjectId(id)})
+    if not hasUserID:
         return Response(
             response = json.dumps('ERRO! USUARIO NAO ENCONTRADO'),
             status = 500,
