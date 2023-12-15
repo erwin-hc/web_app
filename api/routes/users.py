@@ -6,7 +6,6 @@ from bson import ObjectId
 
 data = datetime.now().strftime('%d-%m-%Y')
 
-
 from ..extensions import mongo
 
 user = Blueprint('user', __name__)
@@ -60,7 +59,7 @@ def post_user():
         )
 
 @user.route('/api/user/put/<id>', methods=['PUT'])
-def user_put(id):
+def put_user(id):
     tb_usuarios = mongo.db['TB_USUARIOS']
 
     _nome = request.get_json()['nome']
@@ -92,7 +91,7 @@ def user_put(id):
         )
 
 @user.route('/api/user/delete/<id>', methods=['DELETE'])
-def user_delete(id):
+def delete_user(id):
     tb_usuarios = mongo.db['TB_USUARIOS']
 
     hasID = tb_usuarios.find_one({'_id': ObjectId(id)})

@@ -1,6 +1,7 @@
 from flask import Flask
 from .extensions import mongo
-from .routes.user import user
+from .routes.users import user
+from .routes.custumers import custumer
 
 def start_mongo_service():
     import subprocess
@@ -18,7 +19,9 @@ def create_app(config_object='api.settings'):
     app = Flask(__name__)
     app.config.from_object(config_object)
     app.register_blueprint(user)
+    app.register_blueprint(custumer)
+   
+   
     mongo.init_app(app)
-
     start_mongo_service()
     return app
