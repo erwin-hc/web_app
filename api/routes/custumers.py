@@ -105,6 +105,22 @@ def put_custumer(id):
             mimetype = "application/json"
         )
 
-@custumer.route('/api/custumer/delete/<id>')
+@custumer.route('/api/custumer/delete/<id>', methods=['DELETE'])
 def delete_custumer(id):
-    pass
+    tb_clientes = mongo.db['TB_CLIENTES']
+
+    hasCustumerID = tb_clientes.find_one({'_id': ObjectId(id)})
+    if not hasCustumerID:
+        return Response(
+            response = json.dumps('ERRO! CLIENTE NAO ENCONTRADO'),
+            status = 500,
+            mimetype = "application/json"
+        )
+    else:
+        filtro = { "_id" : hasCustumerID['_id'] }
+        tb_clientes.delete_one(filtro)
+        return Response(
+            response = json.dumps('CLIENTE DELETADO'),
+            status = 200,
+            mimetype = "application/json"
+        )
