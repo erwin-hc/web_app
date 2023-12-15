@@ -1,4 +1,4 @@
-from flask import Blueprint
+from flask import Blueprint, request, Response
 import json
 from datetime import datetime
 from bson import ObjectId
@@ -54,15 +54,17 @@ def post_categories():
 
     _nome = request.get_json()['nome']
     _adicionado_em = data
+    _usuario_id = request.get_json()['usuario_id']
 
     categorySchema = {
         'nome': _nome,
-        'adicionado_em':_data,
+        'adicionado_em':_adicionado_em,
+        'usuario_id': ObjectId(_usuario_id)
     }
 
     hasCategoryName = tb_categorias.find_one({'nome':_nome})
     if not hasCategoryName and request.method == 'POST':
-        tb_categorias.insert_one(userSchema)
+        tb_categorias.insert_one(categorySchema)
         return Response(
             response = json.dumps('CATEGORIA RECEBIDA!'),
             status = 200,
