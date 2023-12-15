@@ -8,12 +8,11 @@ data = datetime.now().strftime('%d-%m-%Y')
 from ..extensions import mongo
 
 # _nomes = ['ESPETOS','CERVEJAS','BEBIDAS']
-# _tamanhos = [['150-G','200-G ','250-G'],['350-ML','475-ML ','600-ML'],['350-ML','600-ML ','1.0-L']]
 # _datas = [ data, data, data]
 
 # doc = []
-# for nome, tamanho, adicionado_em in zip(_nomes, _tamanhos, _datas):
-#     doc.append({'nome':nome, 'tamanho':tamanho, 'adicionado_em': adicionado_em})  
+# for nome, adicionado_em in zip(_nomes, _datas):
+#     doc.append({'nome':nome,'adicionado_em': adicionado_em})  
 
 category = Blueprint('category', __name__)
 @category.route('/api/category/get', methods=['GET'])
@@ -23,10 +22,24 @@ def get_categories():
 
     agrr = tb_categorias.aggregate([
     {     
+        "$lookup":
+        {
+            "from": "TB_USUARIOS",
+            "localField": "usuario_id",
+            "foreignField": "_id",
+            "as": "USUARIO",                        
+        }  
+    },
+    {     
         "$addFields":
         { 
             "_id": { "$toString": "$_id" },
+            "usuario_id": { "$toString": "$_id" },
+            "USUARIO": { "$map": { "input": "$USUARIO", 'in': { "_id": { "$toString": '$$this._id'}, "nome":"$$this.nome" }}}   
         }   
+    },
+    {
+        "$project": {"usuario_id":0}
     }
     ])
     
@@ -37,7 +50,30 @@ def get_categories():
 
 @category.route('/api/category/post', methods=['POST'])
 def post_categories():
-    pass
+    tb_categorias = mongo.db['TB_CATEGORIAS']
+
+    _nome = request.get_json()['nome']
+    _adicionado_em = data
+
+    categorySchema = {
+        'nome': _nome,
+        'adicionado_em':_data,
+    }
+
+    hasCategoryName = tb_categorias.find_one({'nome':_nome})
+    if not hasCategoryName and request.method == 'POST':
+        tb_categorias.insert_one(userSchema)
+        return Response(
+            response = json.dumps('CATEGORIA RECEBIDA!'),
+            status = 200,
+            mimetype = "application/json"
+            )
+    else:        
+        return Response(
+            response = json.dumps('ERRO! CATEGORIA JA EXISTE NO BANCO'),
+            status = 500,
+            mimetype = "application/json"
+        )
 
 
 
